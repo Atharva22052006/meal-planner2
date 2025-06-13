@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-Day Diet Plan | Pune</title>
+    <style>
+        /* Internal CSS for Styling */
+        :root {
+            --primary-color: #28a745; 
+            --primary-dark-color: #218838; 
+            --primary-light-color: #eaf6ec; 
+            --secondary-color: #f8f9fa;
+            --text-color: #333;
+            --border-color: #dee2e6;
+            --card-bg: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --header-bg: #e9ecef;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #main-container {
+            max-width: 900px;
+            margin: auto;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.2em;
+        }
+
+        /* --- Tab Navigation Styles --- */
+        .tab-navigation {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 25px;
+        }
+
+        .tab-button {
+            flex-shrink: 0;
+            padding: 12px 20px;
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            color: #555;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .tab-button:hover {
+            color: var(--primary-dark-color);
+            background-color: var(--primary-light-color);
+        }
+
+        .tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        /* --- Tab Content Styles --- */
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+
+        /* --- Card and Table Styles (from previous version) --- */
+        .intro-card, .day-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px var(--shadow-color);
+            padding: 25px;
+            border: 1px solid var(--border-color);
+        }
+
+        h2, h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+        }
+
+        h2 {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            font-size: 1.8em;
+            color: #1a3a5a;
+        }
+
+        h4 {
+            font-size: 1.2em;
+            color: var(--primary-dark-color);
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .meal-summary ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .meal-summary li {
+            background-color: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+
+        .daily-totals {
+            margin-top: 20px;
+            padding: 15px;
+            background: var(--primary-light-color);
+            border-left: 4px solid var(--primary-color);
+            border-radius: 4px;
+        }
+        
+        .daily-totals ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+            white-space: normal;
+        }
+
+        thead {
+            background-color: var(--header-bg);
+        }
+
+        th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            color: #555;
+        }
+        
+        tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        tbody tr:hover {
+            background-color: #e9ecef;
+        }
+        
+        td[rowspan] {
+            font-weight: bold;
+            vertical-align: middle;
+            color: var(--primary-dark-color);
+            background-color: #f8f9fa;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="main-container">
+        <h1>7-Day Diet Plan</h1>
+        <div id="tab-navigation-container" class="tab-navigation"></div>
+        <div id="tab-content-container"></div>
+    </div>
+
+    <script>
+        // Internal JavaScript for Parsing and Rendering
+        const mealPlanText = `{{ meal_plan_content | safe }}`;
+
+        window.onload = function() {
+            // --- PARSING FUNCTIONS (UNCHANGED) ---
+            function parseSummary(summaryText) {
+                const lines = summaryText.split('\n').map(l => l.trim()).filter(Boolean);
+                const summary = { meals: {}, totals: {} };
+                let currentMeal = null;
+                for (const line of lines) {
+                    if (line.startsWith('Day')) continue;
+                    const mealMatch = line.match(/^- (Breakfast|Lunch|Dinner)/);
+                    if (mealMatch) {
+                        currentMeal = mealMatch[1].toLowerCase();
+                        if (!summary.meals[currentMeal]) summary.meals[currentMeal] = [];
+                    } else if (line.startsWith('Daily Totals')) {
+                        currentMeal = 'totals';
+                    } else if (line.startsWith('- ')) {
+                        if (currentMeal && currentMeal !== 'totals') {
+                            summary.meals[currentMeal].push(line.substring(2).trim());
+                        } else if (currentMeal === 'totals') {
+                            const [key, value] = line.substring(2).trim().split(':').map(s => s.trim());
+                            if (key && value) summary.totals[key] = value;
+                        }
+                    }
+                }
+                return summary;
+            }
+
+            function parseDetails(detailText) {
+                const lines = detailText.split('\n').filter(Boolean);
+                const meals = [];
+                let currentMeal = null;
+                let currentItem = null;
+                for (const line of lines) {
+                    const trimmedLine = line.trim();
+                    if (trimmedLine.startsWith('Day')) continue;
+                    if (line.startsWith('- ')) {
+                        currentMeal = { mealName: trimmedLine.substring(2), items: [] };
+                        meals.push(currentMeal);
+                        currentItem = null;
+                    } else if (line.startsWith('    - ')) {
+                        currentItem = {
+                            name: trimmedLine.substring(2),
+                            calories: '-', protein: '-', carbs: '-', fats: '-',
+                            iron: '-', calcium: '-', vitaminc: '-', cost: '-'
+                        };
+                        if (currentMeal) currentMeal.items.push(currentItem);
+                    } else if (line.startsWith('        - ')) {
+                        if (currentItem) {
+                            const [key, value] = trimmedLine.substring(2).split(':').map(s => s.trim());
+                            const sanitizedKey = key.toLowerCase().replace(/ /g, '');
+                            if (key && value) currentItem[sanitizedKey] = value;
+                        }
+                    }
+                }
+                return meals;
+            }
+
+            // --- DATA PREPARATION (UNCHANGED) ---
+            const separator = '### Daily Macro and Micro-nutrient lists';
+            const [topHalf, bottomHalf] = mealPlanText.split(separator);
+            const topSections = topHalf.split('---').map(s => s.trim()).filter(Boolean);
+            const introText = topSections[0];
+            const summarySections = topSections.slice(1, 8);
+            const noteText = topSections[8];
+            const detailSections = bottomHalf.split(/(?=Day \d)/).map(s => s.trim()).filter(Boolean);
+            
+            // --- DYNAMIC HTML GENERATION FOR TABS ---
+            const tabNavContainer = document.getElementById('tab-navigation-container');
+            const tabContentContainer = document.getElementById('tab-content-container');
+
+            // 1. Create Introduction Tab
+            tabNavContainer.innerHTML += `<button class="tab-button" data-tab-target="#intro">Introduction</button>`;
+            let introHTML = `
+                <div id="intro" class="tab-pane">
+                    <div class="intro-card">
+                        <h2>Introduction & Notes</h2>
+                        <p>${introText.replace(/\n/g, '<br>')}</p>
+                        <p><em><strong>Note:</strong> ${noteText.replace('Note:', '').trim()}</em></p>
+                    </div>
+                </div>`;
+            tabContentContainer.innerHTML += introHTML;
+
+            // 2. Create Tabs for Each Day
+            for (let i = 0; i < summarySections.length; i++) {
+                const dayNum = i + 1;
+                // Add tab button
+                tabNavContainer.innerHTML += `<button class="tab-button" data-tab-target="#day-${dayNum}">Day ${dayNum}</button>`;
+
+                // Prepare content for the day's tab pane
+                const daySummary = parseSummary(summarySections[i]);
+                const dayDetails = parseDetails(detailSections[i]);
+
+                let summaryHTML = `<h3>Day ${dayNum}</h3><div class="meal-summary">`;
+                for (const mealName in daySummary.meals) {
+                    summaryHTML += `<h4>${mealName.charAt(0).toUpperCase() + mealName.slice(1)}</h4><ul>`;
+                    daySummary.meals[mealName].forEach(item => { summaryHTML += `<li>${item}</li>`; });
+                    summaryHTML += `</ul>`;
+                }
+                summaryHTML += `</div><div class="daily-totals"><h4>Daily Totals</h4><ul>`;
+                for (const totalKey in daySummary.totals) {
+                    summaryHTML += `<li><strong>${totalKey}:</strong> ${daySummary.totals[totalKey]}</li>`;
+                }
+                summaryHTML += `</ul></div>`;
+
+                let tableHTML = `
+                    <table><thead><tr>
+                        <th>Meal</th><th>Item</th><th>Calories</th><th>Protein</th><th>Carbs</th><th>Fats</th><th>Iron</th><th>Calcium</th><th>Vitamin C</th><th>Cost</th>
+                    </tr></thead><tbody>`;
+                dayDetails.forEach(meal => {
+                    meal.items.forEach((item, itemIndex) => {
+                        tableHTML += `<tr>`;
+                        if (itemIndex === 0) {
+                            tableHTML += `<td rowspan="${meal.items.length}">${meal.mealName}</td>`;
+                        }
+                        tableHTML += `<td>${item.name}</td><td>${item.calories}</td><td>${item.protein}</td><td>${item.carbs}</td><td>${item.fats}</td><td>${item.iron}</td><td>${item.calcium}</td><td>${item.vitaminc}</td><td>${item.cost}</td></tr>`;
+                    });
+                });
+                tableHTML += `</tbody></table>`;
+                
+                // Add the complete day card to its tab pane
+                tabContentContainer.innerHTML += `
+                    <div id="day-${dayNum}" class="tab-pane">
+                        <div class="day-card">${summaryHTML}${tableHTML}</div>
+                    </div>`;
+            }
+
+            // --- TAB SWITCHING LOGIC ---
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.getAttribute('data-tab-target');
+
+                    // Deactivate all
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabPanes.forEach(pane => pane.classList.remove('active'));
+
+                    // Activate the clicked one
+                    button.classList.add('active');
+                    document.querySelector(targetId).classList.add('active');
+                });
+            });
+
+            // Set the first tab ("Introduction") as active by default
+            if (tabButtons.length > 0) {
+                tabButtons[0].click();
+            }
+        };
+    </script>
+</body>
+</html>

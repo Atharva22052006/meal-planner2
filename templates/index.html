@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Meal Planner</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef2f6; /* Light background */
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 10px; /* Reduced padding for smaller screens */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Full viewport height */
+        }
+
+        .container {
+            max-width: 700px; /* Increased max-width for more horizontal space */
+            width: 95%; /* More responsive width */
+            margin: auto;
+            background: white;
+            padding: 25px; /* Reduced padding */
+            border-radius: 12px; /* More rounded corners */
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15); /* More prominent shadow */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center content horizontally */
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50; /* Darker title color */
+            margin-bottom: 25px; /* Slightly reduced margin */
+            font-size: 2em; /* Slightly reduced font size */
+            font-weight: 700;
+        }
+
+        .form-group {
+            width: 100%; /* Ensure form groups take full width */
+            margin-bottom: 20px; /* Reduced spacing */
+            padding: 12px; /* Reduced padding */
+            border: 1px solid #e0e0e0; /* Light border for separation */
+            border-radius: 8px;
+            background-color: #fcfcfc;
+            box-sizing: border-box;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px; /* Slightly reduced margin */
+            font-weight: 600;
+            color: #555; /* Slightly lighter label color */
+            font-size: 1em; /* Slightly reduced font size */
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%; /* Ensure full width within form-group */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 0.9em; /* Slightly reduced font size */
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            border-color: #4CAF50; /* Highlight on focus */
+            outline: none;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin-top: 10px; /* Reduced margin */
+            -webkit-appearance: none;
+            height: 6px; /* Slightly thinner slider */
+            background: #ddd;
+            border-radius: 3px;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity .2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px; /* Slightly smaller thumb */
+            height: 18px; /* Slightly smaller thumb */
+            background: #4CAF50;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 0 4px rgba(0,0,0,0.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: #4CAF50;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 0 4px rgba(0,0,0,0.2);
+        }
+
+        .slider-value {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 8px; /* Slightly reduced margin */
+            color: #218838;
+            font-size: 1em; /* Slightly reduced font size */
+        }
+
+        .option-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px; /* Reduced gap */
+            margin-top: 12px; /* Reduced margin */
+            justify-content: center;
+        }
+
+        .option-box, .checkbox-option-box {
+            padding: 10px 15px; /* Reduced padding */
+            border: 2px solid #ddd;
+            border-radius: 8px; /* Slightly less rounded */
+            cursor: pointer;
+            background-color: #fcfcfc;
+            transition: all 0.3s ease;
+            flex-grow: 1;
+            text-align: center;
+            min-width: unset; /* Remove min-width to allow more flexibility */
+            max-width: 150px; /* Adjusted max-width */
+            box-sizing: border-box;
+        }
+
+        .option-box:hover, .checkbox-option-box:hover {
+            border-color: #a0d4a7;
+            background-color: #f0f8f0;
+        }
+
+        .option-box.selected, .checkbox-option-box.selected {
+            border-color: #4CAF50;
+            background-color: #eaf6ec;
+            color: #218838;
+            font-weight: bold;
+            box-shadow: 0 0 6px rgba(76, 175, 80, 0.3);
+        }
+
+        .navigation-buttons {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px; /* Increased margin-top for more distance */
+            padding: 0 12px; /* Align with form-group padding */
+            box-sizing: border-box;
+        }
+
+        input[type="submit"],
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px; /* Reduced padding */
+            border: none;
+            border-radius: 5px; /* Slightly less rounded */
+            cursor: pointer;
+            font-size: 1em; /* Slightly reduced font size */
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        input[type="submit"]:hover,
+        button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+
+        input[type="submit"]:disabled,
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: translateY(0);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Progress Indicator Styles */
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px; /* Reduced margin */
+            gap: 8px; /* Reduced gap */
+            width: 100%;
+        }
+
+        .progress-dot {
+            width: 12px; /* Slightly smaller dots */
+            height: 12px; /* Slightly smaller dots */
+            background-color: #ccc;
+            border-radius: 50%;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .progress-dot.active {
+            background-color: #4CAF50;
+            transform: scale(1.2);
+        }
+
+        .progress-dot.completed {
+            background-color: #218838;
+        }
+
+        /* Loading Screen Styles */
+        #loading-screen {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95); /* Slightly less opaque for better look */
+            z-index: 9999;
+            flex-direction: column;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            text-align: center; /* Ensure text within is also centered */
+        }
+
+        .spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #4CAF50;
+            border-radius: 50%;
+            width: 50px; /* Smaller spinner */
+            height: 50px; /* Smaller spinner */
+            animation: spin 1s linear infinite;
+        }
+
+        /* New Dot Spinner styles */
+        .dots-spinner {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .dot {
+            width: 15px;
+            height: 15px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+        .dot:nth-child(3) { animation-delay: 0s; }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
+        }
+
+        #loading-message {
+            font-size: 1.3em; /* Slightly smaller message */
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 8px; /* Reduced margin */
+        }
+
+        #food-tips {
+            font-size: 0.9em; /* Slightly smaller font size */
+            color: #555;
+            min-height: 1.8em; /* Adjusted min-height */
+            transition: opacity 0.5s ease-in-out;
+            opacity: 0; /* Hidden by default */
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(10px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+
+        /* Media Queries for even smaller screens */
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            .form-group {
+                padding: 10px;
+            }
+            label {
+                font-size: 0.95em;
+            }
+            .navigation-buttons {
+                padding: 0 20px; /* Increased padding to increase distance between buttons */
+            }
+            input[type="submit"],
+            button {
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+            .option-box, .checkbox-option-box {
+                padding: 8px 12px;
+                font-size: 0.9em;
+            }
+            .progress-dot {
+                width: 10px;
+                height: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-screen">
+        <div class="spinner"></div>
+        <div class="dots-spinner">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+        <div id="loading-message">Generating your personalized meal plan...</div>
+        <div id="food-tips"></div> <!-- New div for food tips -->
+    </div>
+    <div class="container" id="main-content">
+        <h1>Meal Planner</h1>
+        <div class="progress-indicator" id="progressIndicator"></div>
+        <form id="mealPlanForm" action="/" method="POST">
+            <!-- Question 1: Age -->
+            <div id="question-0" class="form-group">
+                <label for="age">Your Age:</label>
+                <input type="range" id="age" name="age" min="10" max="80" value="25" oninput="updateSliderValue('age', this.value)">
+                <div class="slider-value" id="age-value">25</div>
+            </div>
+
+            <!-- Question 2: Gender -->
+            <div id="question-1" class="form-group hidden">
+                <label>Gender:</label>
+                <div class="option-group">
+                    <div class="option-box" data-value="male" onclick="selectOption('gender', 'male')">Male</div>
+                    <div class="option-box" data-value="female" onclick="selectOption('gender', 'female')">Female</div>
+                    <div class="option-box" data-value="other" onclick="selectOption('gender', 'other')">Other</div>
+                    <input type="hidden" name="gender" id="gender">
+                </div>
+            </div>
+
+            <!-- Question 3: Weight -->
+            <div id="question-2" class="form-group hidden">
+                <label for="weight_kg">Current Weight (kg):</label>
+                <input type="range" id="weight_kg" name="weight_kg" min="30" max="150" value="60" oninput="updateSliderValue('weight_kg', this.value)">
+                <div class="slider-value" id="weight_kg-value">60 kg</div>
+            </div>
+
+            <!-- Question 4: Height -->
+            <div id="question-3" class="form-group hidden">
+                <label for="height_cm">Height (cm):</label>
+                <input type="range" id="height_cm" name="height_cm" min="100" max="220" value="170" oninput="updateSliderValue('height_cm', this.value)">
+                <div class="slider-value" id="height_cm-value">170 cm</div>
+            </div>
+
+            <!-- Question 5: Vegetarian/Non-Vegetarian -->
+            <div id="question-4" class="form-group hidden">
+                <label>Are you Vegetarian or Non-Vegetarian?</label>
+                <div class="option-group">
+                    <div class="option-box" data-value="vegetarian" onclick="selectOption('diet_type', 'vegetarian')">Vegetarian</div>
+                    <div class="option-box" data-value="non-vegetarian" onclick="selectOption('diet_type', 'non-vegetarian')">Non-Vegetarian</div>
+                    <input type="hidden" name="diet_type" id="diet_type">
+                </div>
+            </div>
+
+            <!-- Question 6: Goal -->
+            <div id="question-5" class="form-group hidden">
+                <label>Your Goal:</label>
+                <div class="option-group">
+                    <div class="option-box" data-value="weight_loss" onclick="selectOption('goal', 'weight_loss'); toggleOtherInput('goal-other-input', false)">Weight Loss</div>
+                    <div class="option-box" data-value="muscle_gain" onclick="selectOption('goal', 'muscle_gain'); toggleOtherInput('goal-other-input', false)">Muscle Gain</div>
+                    <div class="option-box" data-value="maintain" onclick="selectOption('goal', 'maintain'); toggleOtherInput('goal-other-input', false)">Maintain Weight</div>
+                    <div class="option-box" data-value="others" onclick="selectOption('goal', 'others'); toggleOtherInput('goal-other-input', true)">Others</div>
+                    <input type="hidden" name="goal" id="goal">
+                </div>
+                <div id="goal-other-input" class="form-group hidden">
+                    <label for="goal_other">Please specify your goal:</label>
+                    <input type="text" id="goal_other" name="goal_other">
+                </div>
+            </div>
+
+            <!-- Question 7: Allergies -->
+            <div id="question-6" class="form-group hidden">
+                <label>Do you have any allergies?</label>
+                <div class="option-group">
+                    <div class="option-box" data-value="no" onclick="selectOption('has_allergies', 'no'); toggleOtherInput('allergies-input', false)">No</div>
+                    <div class="option-box" data-value="yes" onclick="selectOption('has_allergies', 'yes'); toggleOtherInput('allergies-input', true)">Yes</div>
+                    <input type="hidden" name="has_allergies" id="has_allergies">
+                </div>
+                <div id="allergies-input" class="form-group hidden">
+                    <label for="allergies">Please list your allergies (comma-separated):</label>
+                    <input type="text" id="allergies" name="allergies">
+                </div>
+            </div>
+
+            <!-- Question 8: City -->
+            <div id="question-7" class="form-group hidden">
+                <label for="location">Which city are you living in? (for local food options)</label>
+                <input type="text" id="location" name="location">
+            </div>
+
+            <!-- Question 9: Living Situation -->
+            <div id="question-8" class="form-group hidden">
+                <label>What's your living situation?</label>
+                <div class="option-group">
+                    <div class="option-box" data-value="home" onclick="selectOption('living_type', 'home'); toggleOtherInput('living-type-other-input', false)">Home</div>
+                    <div class="option-box" data-value="hostel" onclick="selectOption('living_type', 'hostel'); toggleOtherInput('living-type-other-input', false)">Hostel</div>
+                    <div class="option-box" data-value="pg" onclick="selectOption('living_type', 'pg'); toggleOtherInput('living-type-other-input', false)">PG</div>
+                    <div class="option-box" data-value="office" onclick="selectOption('living_type', 'office'); toggleOtherInput('living-type-other-input', false)">Office</div>
+                    <div class="option-box" data-value="others" onclick="selectOption('living_type', 'others'); toggleOtherInput('living-type-other-input', true)">Others</div>
+                    <input type="hidden" name="living_type" id="living_type">
+                </div>
+                <div id="living-type-other-input" class="form-group hidden">
+                    <label for="living_type_other">Please specify your living situation:</label>
+                    <input type="text" id="living_type_other" name="living_type_other">
+                </div>
+            </div>
+
+            <!-- Question 10: Daily Food Budget -->
+            <div id="question-9" class="form-group hidden">
+                <label for="daily_budget">Your Daily Food Budget (₹):</label>
+                <input type="range" id="daily_budget" name="daily_budget" min="150" max="1000" value="250" oninput="updateSliderValue('daily_budget', this.value, ' ₹')">
+                <div class="slider-value" id="daily_budget-value">250 ₹</div>
+            </div>
+
+            <!-- Question 11: Where you eat -->
+            <div id="question-10" class="form-group hidden">
+                <label>Where do you eat? (Select all that apply)</label>
+                <div class="option-group">
+                    <div class="checkbox-option-box" data-value="mess" onclick="toggleCheckboxOption('food_sources', 'mess')">Mess</div>
+                    <div class="checkbox-option-box" data-value="dhaba" onclick="toggleCheckboxOption('food_sources', 'dhaba')">Dhaba</div>
+                    <div class="checkbox-option-box" data-value="swiggy" onclick="toggleCheckboxOption('food_sources', 'swiggy')">Swiggy/Online Delivery</div>
+                    <div class="checkbox-option-box" data-value="home_cooked" onclick="toggleCheckboxOption('food_sources', 'home_cooked')">Home Cooked</div>
+                    <div class="checkbox-option-box" data-value="others" onclick="toggleCheckboxOption('food_sources', 'others'); toggleOtherInput('food-sources-other-input', document.getElementById('food_sources_others_hidden').checked)">Others</div>
+                    <input type="hidden" name="food_sources" id="food_sources_mess_hidden" value="">
+                    <input type="hidden" name="food_sources" id="food_sources_dhaba_hidden" value="">
+                    <input type="hidden" name="food_sources" id="food_sources_swiggy_hidden" value="">
+                    <input type="hidden" name="food_sources" id="food_sources_home_cooked_hidden" value="">
+                    <input type="hidden" name="food_sources" id="food_sources_others_hidden" value="">
+                </div>
+                <div id="food-sources-other-input" class="form-group hidden">
+                    <label for="food_sources_other">Please specify other food sources (comma-separated):</label>
+                    <input type="text" id="food_sources_other" name="food_sources_other">
+                </div>
+            </div>
+
+            <div class="navigation-buttons">
+                <button type="button" id="prevButton" class="hidden">Previous</button>
+                <button type="button" id="nextButton">Next</button>
+                <input type="submit" id="submitButton" value="Generate Meal Plan" class="hidden">
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let currentQuestionIndex = 0;
+        const totalQuestions = 11; // Total number of questions
+        const questions = [];
+        for (let i = 0; i < totalQuestions; i++) {
+            questions.push(document.getElementById(`question-${i}`));
+        }
+
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+        const submitButton = document.getElementById('submitButton');
+        const mealPlanForm = document.getElementById('mealPlanForm');
+        const progressIndicator = document.getElementById('progressIndicator');
+
+        function updateProgressIndicator() {
+            progressIndicator.innerHTML = ''; // Clear existing dots
+            for (let i = 0; i < totalQuestions; i++) {
+                const dot = document.createElement('div');
+                dot.classList.add('progress-dot');
+                if (i < currentQuestionIndex) {
+                    dot.classList.add('completed');
+                } else if (i === currentQuestionIndex) {
+                    dot.classList.add('active');
+                }
+                dot.addEventListener('click', () => {
+                    // Allow direct navigation only to previous or current questions
+                    // or to the next question if it's valid
+                    if (i <= currentQuestionIndex || (i === currentQuestionIndex + 1 && !nextButton.disabled)) {
+                        currentQuestionIndex = i;
+                        showQuestion(currentQuestionIndex);
+                    }
+                });
+                progressIndicator.appendChild(dot);
+            }
+        }
+
+        function showQuestion(index) {
+            questions.forEach((q, i) => {
+                if (i === index) {
+                    q.classList.remove('hidden');
+                } else {
+                    q.classList.add('hidden');
+                }
+            });
+            updateNavigationButtons();
+            updateProgressIndicator(); // Update progress indicator here
+        }
+
+        function updateNavigationButtons() {
+            prevButton.classList.toggle('hidden', currentQuestionIndex === 0);
+            nextButton.classList.toggle('hidden', currentQuestionIndex === totalQuestions - 1);
+            submitButton.classList.toggle('hidden', currentQuestionIndex !== totalQuestions - 1);
+            validateCurrentQuestion(); // Re-validate on question change
+        }
+
+        function updateSliderValue(sliderId, value, suffix = '') {
+            document.getElementById(`${sliderId}-value`).textContent = value + suffix;
+            // Also ensure the hidden input is set for server-side processing
+            const inputElement = document.getElementById(sliderId);
+            if (inputElement.type === 'range') {
+                inputElement.value = value;
+            }
+            validateCurrentQuestion();
+        }
+
+        function selectOption(name, value) {
+            const hiddenInput = document.getElementById(name);
+            hiddenInput.value = value;
+
+            // Update styling for option boxes
+            const optionGroup = hiddenInput.closest('.option-group');
+            if (optionGroup) {
+                optionGroup.querySelectorAll('.option-box').forEach(box => {
+                    if (box.getAttribute('data-value') === value) {
+                        box.classList.add('selected');
+                    } else {
+                        box.classList.remove('selected');
+                    }
+                });
+            }
+            validateCurrentQuestion();
+        }
+
+        function toggleCheckboxOption(namePrefix, value) {
+            const hiddenInputId = `${namePrefix}_${value}_hidden`;
+            const hiddenInput = document.getElementById(hiddenInputId);
+            const optionBox = event.currentTarget; // The div that was clicked
+
+            if (optionBox.classList.contains('selected')) {
+                optionBox.classList.remove('selected');
+                hiddenInput.value = ''; // Deselect
+            } else {
+                optionBox.classList.add('selected');
+                hiddenInput.value = value; // Select
+            }
+
+            // Special handling for "others" checkbox
+            if (value === 'others') {
+                toggleOtherInput('food-sources-other-input', optionBox.classList.contains('selected'));
+            }
+            validateCurrentQuestion();
+        }
+
+        function toggleOtherInput(inputId, show) {
+            const otherInputDiv = document.getElementById(inputId);
+            const otherInputField = otherInputDiv.querySelector('input[type="text"]');
+            if (show) {
+                otherInputDiv.classList.remove('hidden');
+                // otherInputField.setAttribute('required', 'true'); // Only set required if visible
+                otherInputField.addEventListener('input', validateCurrentQuestion); // Add listener for dynamic validation
+            } else {
+                otherInputDiv.classList.add('hidden');
+                // otherInputField.removeAttribute('required');
+                otherInputField.value = ''; // Clear value if hidden
+                otherInputField.removeEventListener('input', validateCurrentQuestion);
+            }
+            validateCurrentQuestion(); // Re-validate after toggling
+        }
+
+        function validateCurrentQuestion() {
+            let isValid = false;
+            const currentQuestionDiv = questions[currentQuestionIndex];
+
+            // For slider inputs (age, weight, height, daily_budget)
+            const rangeInput = currentQuestionDiv.querySelector('input[type="range"]');
+            if (rangeInput) {
+                isValid = true; // Sliders always have a value
+            }
+
+            // For hidden inputs (gender, diet_type, goal, has_allergies, living_type)
+            const hiddenInput = currentQuestionDiv.querySelector('input[type="hidden"]');
+            if (hiddenInput && hiddenInput.id !== 'gender_hidden' && hiddenInput.id !== 'food_sources_mess_hidden' && hiddenInput.id !== 'food_sources_dhaba_hidden' && hiddenInput.id !== 'food_sources_swiggy_hidden' && hiddenInput.id !== 'food_sources_home_cooked_hidden' && hiddenInput.id !== 'food_sources_others_hidden') {
+                isValid = hiddenInput.value !== '';
+            }
+
+            // For text inputs (location, goal_other, allergies, living_type_other, food_sources_other)
+            const textInput = currentQuestionDiv.querySelector('input[type="text"]');
+            if (textInput) {
+                if (!currentQuestionDiv.classList.contains('hidden') && !textInput.closest('.form-group').classList.contains('hidden')) { // Only validate if visible
+                    isValid = textInput.value.trim() !== '';
+                } else if (textInput.closest('.form-group').classList.contains('hidden')) {
+                    isValid = true; // If the text input's container is hidden, it's not required for validation
+                }
+            }
+
+            // For checkbox groups (food_sources)
+            if (currentQuestionDiv.id === 'question-10') { // Special handling for food_sources
+                const selectedCheckboxes = currentQuestionDiv.querySelectorAll('.checkbox-option-box.selected');
+                isValid = selectedCheckboxes.length > 0;
+
+                // If 'others' is selected in food_sources, check its text input
+                const othersCheckboxSelected = document.getElementById('food_sources_others_hidden').value === 'others';
+                if (othersCheckboxSelected) {
+                    const foodSourcesOtherInput = document.getElementById('food_sources_other');
+                    if (foodSourcesOtherInput.closest('.form-group').classList.contains('hidden')) {
+                        isValid = selectedCheckboxes.length > 0;
+                    } else {
+                        isValid = foodSourcesOtherInput.value.trim() !== '';
+                    }
+                }
+            }
+
+            // For the Gender question, ensure a selection is made
+            if (currentQuestionDiv.id === 'question-1') {
+                const genderHiddenInput = document.getElementById('gender');
+                isValid = genderHiddenInput.value !== '';
+            }
+            // For the Vegetarian/Non-Vegetarian question, ensure a selection is made
+            if (currentQuestionDiv.id === 'question-4') {
+                const dietTypeHiddenInput = document.getElementById('diet_type');
+                isValid = dietTypeHiddenInput.value !== '';
+            }
+            // For the Goal question, ensure a selection is made (or other is filled)
+            if (currentQuestionDiv.id === 'question-5') {
+                const goalHiddenInput = document.getElementById('goal');
+                const goalOtherInputDiv = document.getElementById('goal-other-input');
+                if (goalHiddenInput.value === 'others') {
+                    isValid = goalOtherInputDiv.querySelector('input[type="text"]').value.trim() !== '';
+                } else {
+                    isValid = goalHiddenInput.value !== '';
+                }
+            }
+            // For the Allergies question, ensure a selection is made (or allergies are filled)
+            if (currentQuestionDiv.id === 'question-6') {
+                const hasAllergiesHiddenInput = document.getElementById('has_allergies');
+                const allergiesInputDiv = document.getElementById('allergies-input');
+                if (hasAllergiesHiddenInput.value === 'yes') {
+                    isValid = allergiesInputDiv.querySelector('input[type="text"]').value.trim() !== '';
+                } else {
+                    isValid = hasAllergiesHiddenInput.value !== '';
+                }
+            }
+            // For the Living Situation question, ensure a selection is made (or other is filled)
+            if (currentQuestionDiv.id === 'question-8') {
+                const livingTypeHiddenInput = document.getElementById('living_type');
+                const livingTypeOtherInputDiv = document.getElementById('living-type-other-input');
+                if (livingTypeHiddenInput.value === 'others') {
+                    isValid = livingTypeOtherInputDiv.querySelector('input[type="text"]').value.trim() !== '';
+                } else {
+                    isValid = livingTypeHiddenInput.value !== '';
+                }
+            }
+
+            nextButton.disabled = !isValid;
+            submitButton.disabled = !isValid;
+        }
+
+        nextButton.addEventListener('click', () => {
+            if (currentQuestionIndex < totalQuestions - 1) {
+                if (nextButton.disabled) return; // Prevent advancing if not valid
+                questions[currentQuestionIndex].classList.add('hidden');
+                currentQuestionIndex++;
+                showQuestion(currentQuestionIndex);
+            }
+        });
+
+        prevButton.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                questions[currentQuestionIndex].classList.add('hidden');
+                currentQuestionIndex--;
+                showQuestion(currentQuestionIndex);
+            }
+        });
+
+        // Initial display
+        showQuestion(currentQuestionIndex);
+
+        // Event listeners for immediate validation on input change for non-slider/option elements
+        document.querySelectorAll('input[type="text"], input[type="number"], select').forEach(input => {
+            input.addEventListener('input', validateCurrentQuestion);
+        });
+
+        // Adjust form submission to only show loading screen once all questions are answered
+        mealPlanForm.addEventListener('submit', function(event) {
+            // This event listener will only be triggered when the submit button is clicked
+            // which is only visible on the last question, so no need for explicit check here.
+            event.preventDefault(); // Prevent default submission
+            showLoadingScreen();
+            this.submit(); // Programmatically submit the form
+        });
+
+        // Initial validation call to set button state correctly on page load
+        validateCurrentQuestion();
+
+        // Loading Screen functions (moved here)
+        function showLoadingScreen() {
+            document.getElementById('loading-screen').style.display = 'flex';
+            document.getElementById('main-content').classList.add('hidden');
+            // document.getElementById('main-content').style.filter = 'blur(5px)'; /* Optional: blur background */
+            startFoodTipsAnimation(); // Start the food tips animation
+        }
+
+        function hideLoadingScreen() {
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('main-content').classList.remove('hidden');
+            // document.getElementById('main-content').style.filter = 'none';
+            stopFoodTipsAnimation(); // Stop the animation
+        }
+
+        // Food Tips Animation (already present and working)
+        const foodTips = [
+            "Did you know? Indian spices like turmeric and cumin are packed with antioxidants!",
+            "A balanced Indian thali often includes grains, lentils, vegetables, and a dairy product for complete nutrition.",
+            "Hydration is key! Don't forget to drink plenty of water throughout the day.",
+            "Local and seasonal produce is often more nutritious and flavorful.",
+            "Lentils (dal) are a great source of plant-based protein in Indian diets.",
+            "Yogurt (curd) is excellent for gut health and provides calcium.",
+            "Consider adding a variety of colorful fruits and vegetables to your meals for diverse nutrients.",
+            "Millets like bajra and ragi are ancient grains making a healthy comeback in Indian cuisine.",
+            "Ghee, when consumed in moderation, can be a source of healthy fats and fat-soluble vitamins."
+        ];
+        let currentTipIndex = 0;
+        let foodTipsInterval;
+
+        function startFoodTipsAnimation() {
+            const tipElement = document.getElementById('food-tips');
+            tipElement.style.opacity = 0; // Start hidden
+            currentTipIndex = 0; // Reset index
+            updateFoodTip(); // Display first tip immediately
+            foodTipsInterval = setInterval(() => {
+                tipElement.style.animation = 'none'; // Reset animation
+                void tipElement.offsetWidth; // Trigger reflow
+                tipElement.style.animation = 'fadeInOut 4s infinite'; // Apply new animation
+                currentTipIndex = (currentTipIndex + 1) % foodTips.length;
+                tipElement.textContent = foodTips[currentTipIndex];
+            }, 4000); // Change tip every 4 seconds
+        }
+
+        function updateFoodTip() {
+            const tipElement = document.getElementById('food-tips');
+            tipElement.textContent = foodTips[currentTipIndex];
+            tipElement.style.animation = 'fadeInOut 4s infinite'; // Apply initial animation
+        }
+
+        function stopFoodTipsAnimation() {
+            clearInterval(foodTipsInterval);
+            document.getElementById('food-tips').style.animation = 'none';
+            document.getElementById('food-tips').textContent = ''; // Clear text
+        }
+    </script>
+</body>
+</html>
